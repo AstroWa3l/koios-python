@@ -23,9 +23,14 @@ def get_asset_list(self, content_range="0-999"):
 
 @Exception_Handler
 def get_asset_token_registry(self, content_range="0-999"):
+@Exception_Handler
+def get_asset_token_registry(self, content_range="0-999"):
     """
     Get a list of assets registered via token registry on github
+    Get a list of assets registered via token registry on github
 
+    :return: list of all asset token registry.
+    :rtype: list.    
     :return: list of all asset token registry.
     :rtype: list.    
     """
@@ -34,9 +39,15 @@ def get_asset_token_registry(self, content_range="0-999"):
     token_registry = requests.get(self.ASSET_TOKEN_REGISTRY_URL, headers = custom_headers, timeout=timeout)
     token_registry = json.loads(token_registry.content)
     return token_registry
+    timeout = get_timeout()
+    custom_headers = {"Range": str(content_range)}
+    token_registry = requests.get(self.ASSET_TOKEN_REGISTRY_URL, headers = custom_headers, timeout=timeout)
+    token_registry = json.loads(token_registry.content)
+    return token_registry
 
 
 @Exception_Handler
+def get_asset_addresses(self, asset_policy, asset_name, content_range="0-999"):
 def get_asset_addresses(self, asset_policy, asset_name, content_range="0-999"):
     """
     Get the list of all addresses holding a given asset.
@@ -49,6 +60,7 @@ def get_asset_addresses(self, asset_policy, asset_name, content_range="0-999"):
     timeout = get_timeout()
     custom_headers = {"Range": str(content_range)}
     info = requests.get(f"{self.ASSET_ADDRESSES_URL}{asset_policy}&_asset_name={asset_name}", \
+    info = requests.get(f"{self.ASSET_ADDRESSES_URL}{asset_policy}&_asset_name={asset_name}", \
         headers = custom_headers, timeout=timeout)
     info = json.loads(info.content)
     return info
@@ -57,16 +69,22 @@ def get_asset_addresses(self, asset_policy, asset_name, content_range="0-999"):
 def get_asset_nft_address(self, asset_policy, asset_name):
     """
     Get the address where specified NFT currently reside on.
+    Get the address where specified NFT currently reside on.
 
     :param str asset_policy: asset Policy ID in hexadecimal format (hex).
     :param str asset_name: string with Asset Name in hexadecimal format (hex).
+    :return: list with payment addresses.
     :return: list with payment addresses.
     :rtype: list.
     """
     timeout = get_timeout()
     info = requests.get(f"{self.ASSET_NFT_ADDRESS_URL}{asset_policy}&_asset_name={asset_name}", timeout=timeout)
     info = json.loads(info.content)
+    timeout = get_timeout()
+    info = requests.get(f"{self.ASSET_NFT_ADDRESS_URL}{asset_policy}&_asset_name={asset_name}", timeout=timeout)
+    info = json.loads(info.content)
     return info
+
 
 @Exception_Handler
 def get_asset_info(self, asset_policy, asset_name):
@@ -86,6 +104,8 @@ def get_asset_info(self, asset_policy, asset_name):
 @Exception_Handler
 def get_asset_info_bulk(self, *asset_list):
     """
+    Get the information of a list of assets including first minting & token registry metadata.
+    :param list asset_list: list of assets to query.
     Get the information of a list of assets including first minting & token registry metadata.
     :param list asset_list: list of assets to query.
     :return: list of all asset info.
@@ -118,8 +138,10 @@ def get_asset_history(self, asset_policy, asset_name):
 def get_policy_asset_addresses(self, asset_policy, content_range="0-420"):
     """
    Get the list of addresses with quantity for each asset on the given policy
+   Get the list of addresses with quantity for each asset on the given policy
 
     :param str asset_policy: asset Policy ID in hexadecimal format (hex).
+    :return: list of all addresses.
     :return: list of all addresses.
     :rtype: list.
     """
@@ -128,9 +150,15 @@ def get_policy_asset_addresses(self, asset_policy, content_range="0-420"):
     info = requests.get(f"{self.POLICY_ASSET_ADDRESSES_LIST_URL}{asset_policy}", headers=custom_headers, timeout=timeout)
     info = json.loads(info.content)
     return info
+    timeout = get_timeout()
+    custom_headers = {"Range": str(content_range)}
+    info = requests.get(f"{self.POLICY_ASSET_ADDRESSES_LIST_URL}{asset_policy}", headers=custom_headers, timeout=timeout)
+    info = json.loads(info.content)
+    return info
 
 
 @Exception_Handler
+def get_policy_asset_info(self, asset_policy):
 def get_policy_asset_info(self, asset_policy):
     """
     Get the information for all assets under the same policy.
@@ -141,6 +169,22 @@ def get_policy_asset_info(self, asset_policy):
     """
     timeout = get_timeout()
     info = requests.get(f"{self.POLICY_ASSET_INFO_URL}{asset_policy}", timeout=timeout)
+    info = requests.get(f"{self.POLICY_ASSET_INFO_URL}{asset_policy}", timeout=timeout)
+    info = json.loads(info.content)
+    return info
+
+
+@Exception_Handler
+def get_policy_asset_list(self, asset_policy):
+    """
+    Get the list of asset under the given policy (including balances)
+
+    :param str asset_policy: asset Policy ID in hexadecimal format (hex).
+    :return: list of all assets under the same policy.
+    :rtype: list.
+    """
+    timeout = get_timeout()
+    info = requests.get(f"{self.POLICY_ASSET_LIST_URL}{asset_policy}", timeout=timeout)
     info = json.loads(info.content)
     return info
 
